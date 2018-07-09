@@ -36,6 +36,7 @@ ui <- fluidPage(
       # Show a plot of the generated distribution
       mainPanel(
          plotOutput("dendro"),
+         tableOutput("freq"),
          plotOutput("asoc")
       )
    )
@@ -135,7 +136,9 @@ server <- function(input, output) {
   # Word Clustering
   ## key word
   stem_kw <- reactive({
-    stemDocument(input$kw)
+    input$go
+    
+    isolate({stemDocument(input$kw)})
   })
   
   ## Reduce word number
@@ -186,13 +189,35 @@ server <- function(input, output) {
     })
   })
   
+  ## Plot frequentry terms
+  output$freq <- renderTable({
+    if(is.null(input$file)){
+      return(NULL)
+    }
+    
+    input$go
+    
+    isolate({
+      tdm_vec <- row_sums(sub_tdm())
+      names(tdm_vec) <- sub_tdm()$dimnames$Terms
+      tdm_vec <- tdm_vec[order(tdm_vec, decreasing =T)] / dim(sub_tdm())[2]
+      
+      tdm_mat <- data.frame(Term = names(tdm_vec), Ratio = tdm_vec)
+      
+      head_tdm <- head(tdm_mat)
+      if(input$kw != "" & !(input$kw %in% head_tdm$Term)){
+        head_tdm <- rbind(tdm_mat[input$kw,], head_tdm)
+      }
+      
+      head(head_tdm)
+    })
+  })
+  
   # Plot co occurence
   output$asoc <- renderPlot({
     if(is.null(input$file)){
       return(NULL)
-    } else if (input$kw == ""){
-      return(NULL)
-    }
+    } 
     
     asoc <- findAssocs(tdm(), stem_kw(), 0.2)
     
@@ -211,7 +236,9 @@ server <- function(input, output) {
         scale_x_discrete(breaks=df$id,labels=df$names) +
         theme(plot.margin = unit(c(1,1,2,1), "cm")) +
         theme(axis.text.x = element_text(angle=45, hjust=1, vjust=1, size=rel(2.0)),
-              axis.title.x = element_blank()) 
+              axis.title.x = element_blank(),
+              plot.title = element_text(size = rel(3.0))) +
+        ggtitle(input$kw)
       
       print(p)
     }
