@@ -8,6 +8,7 @@ library(stringr)
 
 library(tm)
 library(dendextend)
+library(slam)
 library(ggplot2)
 
 # Define UI for application that draws a histogram
