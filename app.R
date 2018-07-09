@@ -211,8 +211,8 @@ server <- function(input, output) {
     
     isolate({
       head_tdm <- head(tdm_mat())
-      if(input$kw != "" & !(input$kw %in% head_tdm$Term)){
-        head_tdm <- rbind(tdm_mat()[input$kw,], head_tdm)
+      if(input$kw != "" & !(stem_kw() %in% head_tdm$Term)){
+        head_tdm <- rbind(tdm_mat()[stem_kw(),], head_tdm)
       }
       
       head(head_tdm)
