@@ -244,7 +244,7 @@ server <- function(input, output) {
         theme(axis.text.x = element_text(angle=45, hjust=1, vjust=1, size=rel(2.0)),
               axis.title.x = element_blank(),
               plot.title = element_text(size = rel(3.0))) +
-        ggtitle(paste0(input$kw, " (",round(tdm_mat()[input$kw, "Ratio"],2), ")"))
+        ggtitle(paste0(input$kw, " (",round(tdm_mat()[stem_kw(), "Ratio"],2), ")"))
       
       print(p)
     }
