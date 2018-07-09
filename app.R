@@ -190,11 +190,7 @@ server <- function(input, output) {
   })
   
   ## Plot frequentry terms
-  output$freq <- renderTable({
-    if(is.null(input$file)){
-      return(NULL)
-    }
-    
+  tdm_mat <- reactive({
     input$go
     
     isolate({
@@ -203,10 +199,20 @@ server <- function(input, output) {
       tdm_vec <- tdm_vec[order(tdm_vec, decreasing =T)] / dim(sub_tdm())[2]
       
       tdm_mat <- data.frame(Term = names(tdm_vec), Ratio = tdm_vec)
-      
-      head_tdm <- head(tdm_mat)
+    })
+  })
+  
+  output$freq <- renderTable({
+    if(is.null(input$file)){
+      return(NULL)
+    }
+    
+    input$go
+    
+    isolate({
+      head_tdm <- head(tdm_mat())
       if(input$kw != "" & !(input$kw %in% head_tdm$Term)){
-        head_tdm <- rbind(tdm_mat[input$kw,], head_tdm)
+        head_tdm <- rbind(tdm_mat()[input$kw,], head_tdm)
       }
       
       head(head_tdm)
