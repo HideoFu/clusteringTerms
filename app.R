@@ -1,11 +1,5 @@
-#
-# This is a Shiny web application. You can run the application by clicking
-# the 'Run App' button above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
+# Clustering Terms
+
 
 library(shiny)
 library(readr)
@@ -28,6 +22,7 @@ ui <- fluidPage(
         fileInput("sw", "Stop Words File:"),  # Stop words
         
         sliderInput("word_n", "Word number:", min = 0, max = 160, value = 40),
+        sliderInput("freq_word_n", "Rows:", min = 0, max = 20, value = 5),
         textInput("kw", "Key word:"),
         
         actionButton("go", "Draw")
@@ -210,12 +205,12 @@ server <- function(input, output) {
     input$go
     
     isolate({
-      head_tdm <- head(tdm_mat())
+      head_tdm <- tdm_mat()[1:input$freq_word_n,]
       if(input$kw != "" & !(stem_kw() %in% head_tdm$Term)){
         head_tdm <- rbind(tdm_mat()[stem_kw(),], head_tdm)
       }
       
-      head(head_tdm)
+      head_tdm
     })
   })
   
